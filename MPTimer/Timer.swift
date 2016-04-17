@@ -19,11 +19,12 @@ public typealias DoBlock = @convention(block) (object:AnyObject) -> Void
 public typealias LockedBlock = @convention(block) () -> Void
 
 public final class Timer:NSObject {
+    
     private weak var object:AnyObject?
+    private let behavior:TimerBehavior
     
     private let queue:dispatch_queue_t
     private var timer:dispatch_source_t?
-    private let behavior:TimerBehavior
     private var nextFireTime:NSTimeInterval?
     
     public init(object:AnyObject, behavior:TimerBehavior = .Coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
