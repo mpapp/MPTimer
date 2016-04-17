@@ -15,6 +15,7 @@ public enum TimerBehavior {
     case Delay
 }
 
+public typealias DoBlock = @convention(block) (AnyObject) -> Void
 public typealias LockedBlock = @convention(block) () -> Void
 
 public final class Timer<TimedObject:AnyObject>:NSObject {
@@ -76,7 +77,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
         dispatch_sync(self.queue, block)
     }
     
-    public func after(delay delay:NSTimeInterval, perform block:(object:TimedObject) -> Void) {
+    public func after(delay delay:NSTimeInterval, perform block:DoBlock) {
         let requestTime = now()
         
         self.whileLocked {
@@ -125,7 +126,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
 
             dispatch_source_set_event_handler(timer) {
                 if let object = self.object {
-                    block(object: object) // nothing is done if object was meanwhile set to nil
+                    block(object) // nothing is done if object was meanwhile set to nil
                 }
                 self._cancel()
             }
