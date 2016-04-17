@@ -58,14 +58,14 @@ public final class Timer:NSObject {
     private static var pred:dispatch_once_t = 0
     private static var machTimeInfo = mach_timebase_info_data_t()
 
-    static func timeInfo() -> mach_timebase_info_data_t {
+    private static func timeInfo() -> mach_timebase_info_data_t {
         dispatch_once(&pred) {
             mach_timebase_info(&machTimeInfo)
         }
         return machTimeInfo
     }
     
-    func now() -> NSTimeInterval {
+    private func now() -> NSTimeInterval {
         var t:NSTimeInterval = NSTimeInterval(mach_absolute_time())
         let timeInfo = self.dynamicType.timeInfo()
         t *= NSTimeInterval(timeInfo.numer)
