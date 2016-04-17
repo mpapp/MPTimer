@@ -15,19 +15,18 @@ public enum TimerBehavior {
     case Delay
 }
 
-public typealias DoBlock = @convention(block) (object:AnyObject) -> Void
 public typealias LockedBlock = @convention(block) () -> Void
 
-public final class Timer:NSObject {
+public final class Timer<TimedObject:AnyObject>:NSObject {
     
-    private weak var object:AnyObject?
+    private weak var object:TimedObject?
     private let behavior:TimerBehavior
     
     private let queue:dispatch_queue_t
     private var timer:dispatch_source_t?
     private var nextFireTime:NSTimeInterval?
     
-    public init(object:AnyObject, behavior:TimerBehavior = .Coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
+    public init(object:TimedObject, behavior:TimerBehavior = .Coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
         self.object = object
         self.behavior = behavior
         self.queue = dispatch_queue_create(queueLabel, DISPATCH_QUEUE_SERIAL)
@@ -56,19 +55,18 @@ public final class Timer:NSObject {
         dispatch_set_target_queue(self.queue, target)
     }
         
-    private static var pred:dispatch_once_t = 0
-    private static var machTimeInfo = mach_timebase_info_data_t()
-
-    private static func timeInfo() -> mach_timebase_info_data_t {
-        dispatch_once(&pred) {
-            mach_timebase_info(&machTimeInfo)
+    private var machTimeOnceToken:dispatch_once_t = 0
+    private var machTimeInfo = mach_timebase_info_data_t()
+    private func timeInfo() -> mach_timebase_info_data_t {
+        dispatch_once(&machTimeOnceToken) {
+            mach_timebase_info(&self.machTimeInfo)
         }
         return machTimeInfo
     }
     
     private func now() -> NSTimeInterval {
         var t:NSTimeInterval = NSTimeInterval(mach_absolute_time())
-        let timeInfo = self.dynamicType.timeInfo()
+        let timeInfo = self.timeInfo()
         t *= NSTimeInterval(timeInfo.numer)
         t /= NSTimeInterval(timeInfo.denom)
         return t / Double(NSEC_PER_SEC)
@@ -78,7 +76,7 @@ public final class Timer:NSObject {
         dispatch_sync(self.queue, block)
     }
     
-    public func after(delay delay:NSTimeInterval, perform block:DoBlock) {
+    public func after(delay delay:NSTimeInterval, perform block:(object:TimedObject) -> Void) {
         let requestTime = now()
         
         self.whileLocked {
