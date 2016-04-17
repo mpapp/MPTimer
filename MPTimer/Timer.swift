@@ -21,7 +21,7 @@ public enum TimerBehavior {
 public typealias DoBlock = (object:AnyObject) -> Void
 public typealias LockedBlock = () -> Void
 
-public class MABGTimer {
+public class Timer:NSObject {
     private weak var object:AnyObject?
     
     private let queue:dispatch_queue_t
