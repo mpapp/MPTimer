@@ -10,9 +10,6 @@ import Foundation
 import MachO
 import ObjectiveC
 
-//#import <mach/mach_time.h>
-//#import <objc/runtime.h>
-
 public enum TimerBehavior {
     case Coalesce
     case Delay
