@@ -18,7 +18,7 @@ public enum TimerBehavior {
 public typealias DoBlock = @convention(block) (object:AnyObject) -> Void
 public typealias LockedBlock = @convention(block) () -> Void
 
-public class Timer:NSObject {
+public final class Timer:NSObject {
     private weak var object:AnyObject?
     
     private let queue:dispatch_queue_t
@@ -36,7 +36,7 @@ public class Timer:NSObject {
         self.queue = dispatch_queue_create(queueLabel, DISPATCH_QUEUE_SERIAL)
     }
     
-    public func _cancel() {
+    private func _cancel() {
         guard let scheduledTimer = timer else {
             return
         }
@@ -45,7 +45,7 @@ public class Timer:NSObject {
         self.timer = nil
     }
     
-    func cancel() {
+    public func cancel() {
         self.whileLocked {
             self._cancel()
         }
@@ -81,7 +81,7 @@ public class Timer:NSObject {
         dispatch_sync(self.queue, block)
     }
     
-    func after(delay delay:NSTimeInterval, perform block:DoBlock) {
+    public func after(delay delay:NSTimeInterval, perform block:DoBlock) {
         let requestTime = now()
         
         self.whileLocked {
