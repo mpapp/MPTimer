@@ -18,8 +18,8 @@ public enum TimerBehavior {
     case Delay
 }
 
-public typealias DoBlock = (object:AnyObject) -> Void
-public typealias LockedBlock = () -> Void
+public typealias DoBlock = @convention(block) (object:AnyObject) -> Void
+public typealias LockedBlock = @convention(block) () -> Void
 
 public class Timer:NSObject {
     private weak var object:AnyObject?
