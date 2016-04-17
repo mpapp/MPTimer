@@ -26,11 +26,7 @@ public final class Timer:NSObject {
     private let behavior:TimerBehavior
     private var nextFireTime:NSTimeInterval?
     
-    public convenience init(object:AnyObject) {
-        self.init(object:object, behavior:.Coalesce, queueLabel: "com.manuscriptsapp.Timer")
-    }
-
-    public required init(object:AnyObject, behavior:TimerBehavior, queueLabel:String) {
+    public init(object:AnyObject, behavior:TimerBehavior = .Coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
         self.object = object
         self.behavior = behavior
         self.queue = dispatch_queue_create(queueLabel, DISPATCH_QUEUE_SERIAL)
