@@ -15,7 +15,7 @@ public enum TimerBehavior {
     case Delay
 }
 
-public typealias DoBlock = @convention(block) (AnyObject) -> Void
+public typealias ObjCCompatibleDoBlock = @convention(block) (AnyObject) -> Void
 public typealias LockedBlock = @convention(block) () -> Void
 
 public final class Timer<TimedObject:AnyObject>:NSObject {
@@ -77,7 +77,14 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
         dispatch_sync(self.queue, block)
     }
     
-    public func after(delay delay:NSTimeInterval, perform block:DoBlock) {
+    public func after(delay delay:NSTimeInterval, perform block:(TimedObject)->Void) {
+        let doBlock:ObjCCompatibleDoBlock = { obj in
+            block(obj as! TimedObject)
+        }
+        self.after(delay: delay, perform:doBlock)
+    }
+    
+    public func after(delay delay:NSTimeInterval, perform block:ObjCCompatibleDoBlock) {
         let requestTime = now()
         
         self.whileLocked {
