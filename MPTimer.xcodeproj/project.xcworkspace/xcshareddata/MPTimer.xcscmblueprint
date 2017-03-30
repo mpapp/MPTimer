@@ -1,0 +1,37 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "0B46AFD1026CD985461C32D018E045171075B8F4",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "0B5936C9CBA1409844D74AA6E444E0F825C39CB9" : 9223372036854775807,
+    "61D2CAD284CE7760A8C037547DCCA2B89A89535F" : 9223372036854775807,
+    "0B46AFD1026CD985461C32D018E045171075B8F4" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "737ED71B-51EB-427B-93AC-F6F397DFC076",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "0B5936C9CBA1409844D74AA6E444E0F825C39CB9" : "..\/..\/..\/..\/..",
+    "61D2CAD284CE7760A8C037547DCCA2B89A89535F" : "..\/..",
+    "0B46AFD1026CD985461C32D018E045171075B8F4" : "MPTimer\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "MPTimer",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "MPTimer.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "ssh:\/\/github.com\/mpapp\/MPTimer.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "0B46AFD1026CD985461C32D018E045171075B8F4"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:mpapp\/Manuscripts.app.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "0B5936C9CBA1409844D74AA6E444E0F825C39CB9"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "ssh:\/\/github.com\/mpapp\/Extensions.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "61D2CAD284CE7760A8C037547DCCA2B89A89535F"
+    }
+  ]
+}

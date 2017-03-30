@@ -9,10 +9,23 @@
 import Foundation
 import MachO
 import ObjectiveC
+// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
+// Consider refactoring the code to use the non-optional operators.
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
 
 public enum TimerBehavior {
-    case Coalesce
-    case Delay
+    case coalesce
+    case delay
 }
 
 public typealias ObjCCompatibleDoBlock = @convention(block) (AnyObject) -> Void
@@ -20,25 +33,29 @@ public typealias LockedBlock = @convention(block) () -> Void
 
 public final class Timer<TimedObject:AnyObject>:NSObject {
     
-    private weak var object:TimedObject?
-    private let behavior:TimerBehavior
+    private lazy var __once: () = {
+        mach_timebase_info(&self.machTimeInfo)
+    }()
     
-    private let queue:dispatch_queue_t
-    private var timer:dispatch_source_t?
-    private var nextFireTime:NSTimeInterval?
+    fileprivate weak var object:TimedObject?
+    fileprivate let behavior:TimerBehavior
     
-    public init(object:TimedObject, behavior:TimerBehavior = .Coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
+    fileprivate let queue:DispatchQueue
+    fileprivate var timer:DispatchSourceTimer?
+    fileprivate var nextFireTime:TimeInterval?
+    
+    public init(object:TimedObject, behavior:TimerBehavior = .coalesce, queueLabel:String = "com.manuscriptsapp.Timer") {
         self.object = object
         self.behavior = behavior
-        self.queue = dispatch_queue_create(queueLabel, DISPATCH_QUEUE_SERIAL)
+        self.queue = DispatchQueue(label: queueLabel, attributes: [])
     }
     
-    private func _cancel() {
+    fileprivate func _cancel() {
         guard let scheduledTimer = timer else {
             return
         }
         
-        dispatch_source_cancel(scheduledTimer)
+        scheduledTimer.cancel()
         self.timer = nil
     }
     
@@ -52,39 +69,37 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
         self._cancel()
     }
     
-    public func setTargetQueue(target:dispatch_queue_t) {
-        dispatch_set_target_queue(self.queue, target)
+    public func setTargetQueue(_ target:DispatchQueue) {
+        self.queue.setTarget(queue: target)
     }
         
-    private var machTimeOnceToken:dispatch_once_t = 0
-    private var machTimeInfo = mach_timebase_info_data_t()
-    private func timeInfo() -> mach_timebase_info_data_t {
-        dispatch_once(&machTimeOnceToken) {
-            mach_timebase_info(&self.machTimeInfo)
-        }
+    fileprivate var machTimeOnceToken:Int = 0
+    fileprivate var machTimeInfo = mach_timebase_info_data_t()
+    fileprivate func timeInfo() -> mach_timebase_info_data_t {
+        _ = self.__once
         return machTimeInfo
     }
     
-    private func now() -> NSTimeInterval {
-        var t:NSTimeInterval = NSTimeInterval(mach_absolute_time())
+    fileprivate func now() -> TimeInterval {
+        var t:TimeInterval = TimeInterval(mach_absolute_time())
         let timeInfo = self.timeInfo()
-        t *= NSTimeInterval(timeInfo.numer)
-        t /= NSTimeInterval(timeInfo.denom)
+        t *= TimeInterval(timeInfo.numer)
+        t /= TimeInterval(timeInfo.denom)
         return t / Double(NSEC_PER_SEC)
     }
     
     public func whileLocked(perform block:LockedBlock) {
-        dispatch_sync(self.queue, block)
+        self.queue.sync(execute: block)
     }
     
-    public func after(delay delay:NSTimeInterval, perform block:(TimedObject)->Void) {
+    public func after(delay:TimeInterval, perform block:@escaping (TimedObject)->Void) {
         let doBlock:ObjCCompatibleDoBlock = { obj in
             block(obj as! TimedObject)
         }
         self.after(delay: delay, perform:doBlock)
     }
     
-    public func after(delay delay:NSTimeInterval, perform block:ObjCCompatibleDoBlock) {
+    public func after(delay:TimeInterval, perform block:@escaping ObjCCompatibleDoBlock) {
         let requestTime = now()
         
         self.whileLocked {
@@ -92,7 +107,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             // adjust delay to take into account time elapsed between the method call and execution of this block
             let nowValue = self.now()
             
-            var adjustedDelay:NSTimeInterval = delay - (nowValue - requestTime)
+            var adjustedDelay:TimeInterval = delay - (nowValue - requestTime)
             if (adjustedDelay < 0.0) {
                 adjustedDelay = 0.0
             }
@@ -103,10 +118,10 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             if !hasTimer {
                 shouldProceed = true
             }
-            else if self.behavior == .Delay {
+            else if self.behavior == .delay {
                 shouldProceed = true
             }
-            else if self.behavior == .Coalesce && (self.nextFireTime != nil || (self.now() + adjustedDelay) < self.nextFireTime) {
+            else if self.behavior == .coalesce && (self.nextFireTime != nil || (self.now() + adjustedDelay) < self.nextFireTime) {
                 shouldProceed = true
             }
             else {
@@ -118,7 +133,8 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             }
             
             if !hasTimer {
-                self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self.queue)
+                self.timer = DispatchSource.makeTimerSource(flags: DispatchSource.TimerFlags(rawValue: 0),
+                                                            queue: self.queue)
             }
             
             guard let timer = self.timer else {
@@ -126,12 +142,13 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             }
             
             let td = Int64(ceil(Double(adjustedDelay) * Double(NSEC_PER_SEC)))
-            let t = dispatch_time(DISPATCH_TIME_NOW, td)
+            let t = DispatchTime.now() + Double(td) / Double(NSEC_PER_SEC)
             
-            dispatch_source_set_timer(timer, t, 0, 0)
+            timer.scheduleOneshot(deadline: t)
+            
             self.nextFireTime = self.now() + adjustedDelay
 
-            dispatch_source_set_event_handler(timer) {
+            timer.setEventHandler {
                 if let object = self.object {
                     block(object) // nothing is done if object was meanwhile set to nil
                 }
@@ -140,7 +157,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             
             // if the timer was newly created.
             if !hasTimer {
-                dispatch_resume(timer)
+                timer.resume()
             }
         }
     }
