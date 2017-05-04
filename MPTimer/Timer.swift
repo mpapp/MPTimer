@@ -9,19 +9,6 @@
 import Foundation
 import MachO
 import ObjectiveC
-// FIXME: comparison operators with optionals were removed from the Swift Standard Libary.
-// Consider refactoring the code to use the non-optional operators.
-fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
-  switch (lhs, rhs) {
-  case let (l?, r?):
-    return l < r
-  case (nil, _?):
-    return true
-  default:
-    return false
-  }
-}
-
 
 public enum TimerBehavior {
     case coalesce
@@ -121,7 +108,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             else if self.behavior == .delay {
                 shouldProceed = true
             }
-            else if self.behavior == .coalesce && (self.nextFireTime != nil || (self.now() + adjustedDelay) < self.nextFireTime) {
+            else if self.behavior == .coalesce, let nextFireTime = self.nextFireTime, (self.now() + adjustedDelay) < nextFireTime {
                 shouldProceed = true
             }
             else {
