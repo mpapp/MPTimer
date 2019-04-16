@@ -131,7 +131,7 @@ public final class Timer<TimedObject:AnyObject>:NSObject {
             let td = Int64(ceil(Double(adjustedDelay) * Double(NSEC_PER_SEC)))
             let t = DispatchTime.now() + Double(td) / Double(NSEC_PER_SEC)
             
-            timer.scheduleOneshot(deadline: t)
+            timer.schedule(deadline: t)
             
             self.nextFireTime = self.now() + adjustedDelay
 
