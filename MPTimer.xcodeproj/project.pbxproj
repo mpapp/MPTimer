@@ -104,11 +104,11 @@
 			};
 			buildConfigurationList = 5FFD01A01CC180B2008BC80E /* Build configuration list for PBXProject "MPTimer" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
+				Base,
 			);
 			mainGroup = 5FFD019C1CC180B2008BC80E;
 			productRefGroup = 5FFD01A71CC180B2008BC80E /* Products */;
