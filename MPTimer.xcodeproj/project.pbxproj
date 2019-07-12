@@ -13,9 +13,9 @@
 
 /* Begin PBXFileReference section */
 		5FFD01A61CC180B2008BC80E /* MPTimer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MPTimer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		5FFD01A91CC180B2008BC80E /* MPTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MPTimer.h; sourceTree = "<group>"; };
+		5FFD01A91CC180B2008BC80E /* MPTimer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MPTimer.h; path = ../Sources/MPTimer.h; sourceTree = "<group>"; };
 		5FFD01AB1CC180B2008BC80E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5FFD01B11CC180C7008BC80E /* Timer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Timer.swift; sourceTree = "<group>"; };
+		5FFD01B11CC180C7008BC80E /* Timer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Timer.swift; path = ../Sources/MPTimer/Timer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
